@@ -1,0 +1,14 @@
+#
+# ADDITIONAL_DEFAULT_PROPERTIES
+#
+ro.secure=0
+ro.allow.mock.location=0
+persist.mtk.aee.aed=on
+ro.debuggable=1
+ro.adb.secure=0
+ro.telephony.ril_class=MediaTekRIL
+persist.sys.usb.config=mtp
+persist.service.acm.enable=0
+ro.mount.fs=EXT4
+ro.persist.partition.support=no
+persist.sys.force_highendgfx=true

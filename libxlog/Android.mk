@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 The Android Open Source Project
+# Copyright (C) 2008 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+LOCAL_PATH := $(my-dir)
 
-# This file is executed by build/envsetup.sh, and can use anything
-# defined in envsetup.sh.
-#
-# In particular, you can add lunch options with the add_lunch_combo
-# function: add_lunch_combo generic-eng
+include $(CLEAR_VARS)
 
-add_lunch_combo cm_yaris_m_gsm-eng
+LOCAL_CFLAGS += $(LIBLOG_CFLAGS)
+LOCAL_MODULE := libxlog
+LOCAL_SRC_FILES := xlog.c mtkaudio.cpp
+LOCAL_C_INCLUDES += frameworks/av/media/mtp/ system/core/include/ frameworks/rs/server/ frameworks/av/include/ hardware/libhardware/include/
+LOCAL_SHARED_LIBRARIES := libcutils liblog libutils libbinder
 
+include $(BUILD_SHARED_LIBRARY)
