@@ -1,6 +1,6 @@
 #ifndef _BDROID_BUILDCFG_H
 #define _BDROID_BUILDCFG_H
 
-#define BTM_DEF_LOCAL_NAME   "Q"
+#define BTM_DEF_LOCAL_NAME   "MTS 982T"
 
 #endif

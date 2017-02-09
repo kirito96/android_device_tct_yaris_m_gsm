@@ -25,18 +25,11 @@ $(INSTALLED_KERNEL_TARGET).mtk.header: $(INSTALLED_KERNEL_TARGET)
 		$(call make_header, $$((size)), "KERNEL", $@)
 $(INSTALLED_KERNEL_TARGET).mtk: $(INSTALLED_KERNEL_TARGET).mtk.header
 	$(call pretty,"Adding MTK header to kernel.")
-#	cat $(INSTALLED_KERNEL_TARGET) > $@
-	cat $(INSTALLED_KERNEL_TARGET).mtk.header $(INSTALLED_KERNEL_TARGET) > $@
+	cat $(INSTALLED_KERNEL_TARGET) > $@
 	
 INSTALLED_RAMDISK_TARGET := $(BUILT_RAMDISK_TARGET)
 $(INSTALLED_RAMDISK_TARGET): $(MKBOOTFS) $(INTERNAL_RAMDISK_FILES) | $(MINIGZIP)
 	$(call pretty,"Target ram disk: $@")
-	cmp -s device/elephone/Q/rootdir/custom_init out/target/product/Q/root/init; \
-	RETVAL=$$?; \
-	if [ $$RETVAL -eq 1 ]; then \
-		mv out/target/product/Q/root/init out/target/product/Q/root/init2; \
-		cp device/elephone/Q/rootdir/custom_init out/target/product/Q/root/init; \
-	fi
 	$(hide) $(MKBOOTFS) $(TARGET_ROOT_OUT) | $(MINIGZIP) > $@
 
 $(INSTALLED_RAMDISK_TARGET).mtk.header: $(INSTALLED_RAMDISK_TARGET)
@@ -52,8 +45,7 @@ $(PRODUCT_OUT)/recovery_kernel.mtk.header: $(recovery_kernel)
 		$(call make_header, $$((size)), "KERNEL", $@)
 $(PRODUCT_OUT)/recovery_kernel.mtk: $(PRODUCT_OUT)/recovery_kernel.mtk.header
 	$(call pretty,"Adding MTK header to recovery kernel.")
-#	cat $(recovery_kernel) > $@
-	cat $(PRODUCT_OUT)/recovery_kernel.mtk.header $(recovery_kernel) > $@
+	cat $(recovery_kernel) > $@
 
 $(recovery_ramdisk).mtk.header: $(recovery_ramdisk)
 	size=$$($(call get-file-size,$(recovery_ramdisk))); \
@@ -68,9 +60,9 @@ INTERNAL_MTK_BOOTIMAGE_ARGS := \
 
 $(INSTALLED_BOOTIMAGE_TARGET): $(MKBOOTIMG)\
 		$(INSTALLED_RAMDISK_TARGET).mtk $(INSTALLED_KERNEL_TARGET).mtk
-	@echo -e ${CL_CYN}"----- Making boot image ------"${CL_RST}
-	$(MKBOOTIMG) $(INTERNAL_MTK_BOOTIMAGE_ARGS) \
-		$(BOARD_MKBOOTIMG_ARGS) --output $@
+	$(call pretty,"Target boot image: $@")
+	$(MKBOOTIMG) $(INTERNAL_MTK_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS) \
+		--output $@
 	$(hide) $(call assert-max-image-size,$@, \
 		$(BOARD_BOOTIMAGE_PARTITION_SIZE),raw)
 	@echo -e ${CL_CYN}"Made boot image: $@"${CL_RST}

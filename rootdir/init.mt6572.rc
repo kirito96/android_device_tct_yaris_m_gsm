@@ -1,19 +1,26 @@
 import init.mt6572.usb.rc
 import init.modem.rc
-import init.fuse.rc
+
+on charger
+    mount ext4 /emmc@android /system ro wait
+    start drvbd
+    start ipod
+    start servicemanager
+
+    # disable USB
+    write /sys/devices/platform/mt_usb/cmode 0
 
 on init
-    mkdir /protect_f 0771 system system
-    mkdir /protect_s 0771 system system
-    #Create CIP mount point
-    mkdir /custom
+    export LD_PRELOAD "libxlog.so"
+
+    # By default, primary storage is physical
+    setprop ro.vold.primary_physical 1
+
+    symlink /sdcard /mnt/sdcard
+    symlink /sdcard /storage/sdcard0
 
     chown system graphics /dev/ion
     chmod 0644 /dev/ion
-
-    # change lk_env permission
-    chown root system /proc/lk_env
-    chmod 0660 /proc/lk_env
 
     # TODO: fix system apps run with unknown user resume 0660
     chmod 0666 /dev/mali
@@ -28,20 +35,25 @@ on init
     chmod 0660 /dev/sw_sync
     chown system graphics /dev/sw_sync
 
+    chown system system /dev/rtc0
+    chmod 0660 /dev/rtc0
+
     chown system media /dev/MJC
     chmod 0660 /dev/MJC
 
-    #Define device for ATCID
-    chmod 660 /dev/ttyGS0 
-    chown system /dev/ttyGS0 
-    chmod 660 /dev/ttyGS1 
-    chown system /dev/ttyGS1
-    chmod 0660 /dev/ttyGS2
-	
+    chown media media /dev/ccci_pcm_rx
+    chmod 0660 /dev/ccci_pcm_rx
+    chown media media /dev/ccci_pcm_tx
+    chmod 0660 /dev/ccci_pcm_tx
 
     chown bluetooth radio /dev/ttyGS2
-    chmod 0660 /dev/ttyGS3
+    chmod 0660 /dev/ttyGS2
     chown system radio /dev/ttyGS3
+    chmod 0660 /dev/ttyGS3
+    chown system /dev/ttyGS0
+    chmod 660 /dev/ttyGS0 
+    chown system /dev/ttyGS1
+    chmod 660 /dev/ttyGS1
 
     chown bluetooth bluetooth /dev/hid-keyboard
     chmod 0660 /dev/hid-keyboard
@@ -49,24 +61,14 @@ on init
     chown system media /dev/uibc
     chmod 0660 /dev/uibc
 
-    #/dev/ttyMT2 for Connectivity BT/FM/GPS usage
-    chmod 0660 /dev/ttyMT2
-    chown system system /dev/ttyMT2
-
-    chmod 0660 /dev/ttyMT1
-    chown system system /dev/ttyMT1
-
     # GPS
-    chmod 0666 /dev/gps
-    chmod 0660 /dev/stpgps
-    chown gps gps /dev/stpgps
     chown gps gps /sys/class/gpsdrv/gps/pwrctl
     chown gps gps /sys/class/gpsdrv/gps/suspend
     chown gps gps /sys/class/gpsdrv/gps/state
     chown gps gps /sys/class/gpsdrv/gps/pwrsave
     chown gps gps /sys/class/gpsdrv/gps/status
 
-    ## Thermal
+    # Thermal
     #change permissions on thermal devices
     chown root system /proc/mtktscpu/mtktscpu
     chmod 0660 /proc/mtktscpu/mtktscpu
@@ -103,17 +105,10 @@ on init
     chmod 0660 /dev/kd_camera_hw_bus2
     chmod 0660 /dev/FM50AF
     chmod 0660 /dev/OV8825AF
-	chmod 0660 /dev/IMX179AF
-    chmod 0660 /dev/OV8826AF
-    chmod 0660 /dev/LITEON3H7AF
-	chmod 0660 /dev/OV8865AF 
+    chmod 0660 /dev/DW9714AF
+    chmod 0660 /dev/AD5823AF
     chmod 0660 /dev/CAM_CAL_DRV
-    chmod 0660 /dev/S5K4E1GAAF
-    chmod 0660 /dev/OV5648AF
-    chmod 0660 /dev/GC5004AF
-    chmod 0660 /dev/S5K4H5YCAF
-    chmod 0660 /dev/S5K3H7YAF
-    chmod 0660 /dev/BU6424AF
+
     chown system camera /dev/camera-sysram
     chown system camera /dev/camera-isp
     chown system camera /dev/camera-pipemgr
@@ -121,18 +116,10 @@ on init
     chown system camera /dev/kd_camera_flashlight
     chown system camera /dev/kd_camera_hw_bus2
     chown system camera /dev/FM50AF
-    chown system camera /dev/IMX179AF
     chown system camera /dev/OV8825AF
-    chown system camera /dev/OV8826AF
-	chown system camera /dev/OV8865AF
-    chown system camera /dev/LITEON3H7AF
+    chown system camera /dev/DW9714AF
+    chown system camera /dev/AD5823AF
     chown system camera /dev/CAM_CAL_DRV
-    chown system camera /dev/S5K4E1GAAF
-    chown system camera /dev/OV5648AF
-    chown system camera /dev/GC5004AF
-    chown system camera /dev/S5K4H5YCAF
-    chown system camera /dev/S5K3H7YAF
-	chown system camera /dev/BU6424AF
 
     chown system system /dev/RT_Monitor
     chmod 0600 /dev/RT_Monitor
@@ -141,7 +128,7 @@ on init
     chmod 0660 /dev/mt_otg_test
 
     chown system media /dev/MTK_SMI
-    chmod 0666 /dev/MTK_SMI
+    chmod 0660 /dev/MTK_SMI
     chown system media /dev/mtk_sched
     chmod 0660 /dev/mtk_sched
     chown system media /dev/ebc
@@ -181,7 +168,7 @@ on init
 
     # Charge
     chmod 0666 /dev/MT_pmic_adc_cali
-
+	
     # Accdet
     chown root radio /sys/devices/platform/Accdet_Driver/driver/accdet_call_state
 
@@ -193,38 +180,67 @@ on init
     chown radio radio /sys/devices/platform/mtk-kpd/driver/kpd_call_state
 
     # Charging Battery
-        chown radio radio /sys/devices/platform/battery/Charging_CallState
+    chown radio radio /sys/devices/platform/battery/Charging_CallState
 
     mkdir /data/amit/ 0770 system system
-		mkdir /data/misc/sensor 0774 system system
+    mkdir /data/misc/sensor 0774 system system
     mkdir /data/misc/akmd 0770 system system
     mkdir /data/misc/s62x 0771 compass compass
-    mkdir /data/misc/acdapi/ 0770 system system
+    mkdir /data/acdapi/ 0770 system system
     chmod 0666 /data/misc/acdapi/calib.dat
     chmod 0666 /data/misc/acdapi/param.dat
     chmod 0666 /data/misc/acdapi/sensors.dat
-    chown system /sys/class/input/input4/enable
-    chown system /sys/class/input/input4/delay
-    chown system /sys/class/input/input4/wake
-    chown system /sys/class/input/input2/enable
-    chown system /sys/class/input/input2/wake
-    chown system /sys/class/input/input3/offsets    
-     #a800 msensor relative input devices setting
-    #orientation
-    chown system /sys/class/input/input6/enable
-    chown system /sys/class/input/input6/delay
-    chown system /sys/class/input/input6/wake
-    #geomagnetic raw
-    chown system /sys/class/input/input5/offsets
-    chown system /sys/class/input/input5/dynamic_matrix
-    #end
+    chown system /sys/class/input/input5/enable
+    chown system /sys/class/input/input5/delay
+    chown system /sys/class/input/input5/wake
+    chown system /sys/class/input/input3/enable
+    chown system /sys/class/input/input3/wake
+    chown system /sys/class/input/input4/offsets    
     chown system /sys/devices/platform/msensor/driver/cpsopmode
     chown system /sys/devices/platform/msensor/driver/cpsreptxy
     chown system /sys/devices/platform/msensor/driver/cpsreptz
     chown system /sys/devices/platform/gsensor/driver/cpsopmode
     chown system /sys/devices/platform/gsensor/driver/cpsrange
+    chown system /sys/devices/platform/gsensor/driver/cpsbandwidth
     mkdir	/data/data/mcube 0664 system system
- 
+
+    chmod 0664 /sys/devices/platform/mt-pmic/pmic_access_bank0
+    chmod 0664 /sys/devices/platform/mt-pmic/pmic_access_bank1
+    chmod 0664 /sys/devices/platform/mt6333-user/mt6333_access
+    chmod 0664 /sys/devices/platform/mt-pmic/pmic_access
+    chmod 0664 /sys/bus/platform/drivers/mem_bw_ctrl/concurrency_scenario
+    chmod 0664 /sys/module/lowmemorykiller/parameters/adj
+    chmod 0664 /sys/module/lowmemorykiller/parameters/minfree
+    chmod 0660 /sys/power/autosleep
+    chmod 0660 /sys/power/state
+    chmod 0660 /sys/power/sb_state
+    chmod 0660 /sys/power/wake_lock
+    chmod 0660 /sys/power/wake_unlock
+    chmod 0664 /sys/class/leds/lcd-backlight/brightness
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/timer_rate
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/timer_slack   
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/min_sample_time
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/hispeed_freq
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/target_loads
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/above_hispeed_delay
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/boost
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/input_boost
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/boostpulse_duration
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/io_is_busy
+    chmod 0660 /sys/devices/system/cpu/cpufreq/hotplug/cpu_num_base
+    chmod 0660 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+    chmod 0664 /sys/class/leds/lcd-backlight/brightness
+    chmod 0770 /sys/power/tuxonice
+    chmod 0220 /sys/power/tuxonice/do_hibernate
+
+    # TV-out
+    chmod 0664 /dev/TV-out
+
+    # HDMI
+    chown meida system /dev/hdmitx
+    chmod 0664 /dev/hdmitx
+
     # JPEG
     chmod 0444 /dev/mtk_jpeg
     chown system camera /dev/mtk_jpeg
@@ -234,7 +250,6 @@ on post-fs-data
     mkdir /data/misc/wifi 0770 wifi wifi
     mkdir /data/misc/wifi/sockets 0770 wifi wifi
     mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
-    chown wifi wifi /data/misc/wifi
     mkdir /data/misc/dhcp 0770 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcp
 
@@ -247,18 +262,18 @@ on post-fs-data
     #Use uinput's default permission
     chown system net_bt_admin /dev/uinput
 
-    # create for muxd pts device node , to operate without root
     mkdir /dev/radio 0770 radio radio
 
-    # set ptmx group to non-root
-    chown root radio /dev/ptmx
+    # NFC
+    chmod 0666 /dev/mt6605
+    chown system system /dev/mt6605
+    mkdir /data/nfc_socket 0771 nfc radio
 
-    # RTC
-    mkdir /data/misc/rtc 0770 system system
-    chown system system /dev/rtc0
-    chmod 0660 /dev/rtc0
+    # GPS
+    mkdir /data/agps_supl 0771 gps system
+    mkdir /data/gps_mnl 0771 gps system
 
-    start adbd
+    mkdir /data/misc/gps 0770 gps gps
 
 on post-fs
     exec /system/xbin/mknod /dev/wmtWifi c 153 0
@@ -269,7 +284,7 @@ on post-fs
     exec /system/xbin/mknod /dev/Vcodec c 160 0
     chmod 0666 /dev/Vcodec
     chown system media /dev/Vcodec
-
+	
     # devmap
     exec /system/xbin/mknod /dev/devmap c 196 0
     chmod 0444 /dev/devmap
@@ -280,18 +295,18 @@ on post-fs
     chmod 0777 /dev/fm
     chown system media /dev/fm
 
-    chown system system /protect_f
-    chmod 0771 /protect_f
-
-    chown system system /protect_s
-    chmod 0771 /protect_s
-
     # for ppp options file
     mkdir /data/misc/ppp 0770 bluetooth net_bt
 
     exec /system/xbin/mknod /dev/stpwmt c 190 0
     exec /system/xbin/mknod /dev/stpgps c 191 0
     exec /system/xbin/mknod /dev/stpbt  c 192 0
+
+    # GPS
+    chmod 0666 /dev/gps
+    chown system gps /dev/gps
+    chmod 0660 /dev/stpgps
+    chown gps gps /dev/stpgps
 
     # BT
     chmod 0660 /dev/stpbt
@@ -304,64 +319,35 @@ on post-fs
     chown system system /dev/wmtdetect
 
     mkdir /data/nvram 2770 root system
+    chmod 0770 /dev/nvram
+
+    chown radio radio /sys/kernel/ccci/boot
 
     chown radio system /system/etc/ril
     chmod 0770 /system/etc/ril
     chmod 0444 /system/etc/ril/oper.lis
     setprop rild.nw.operlist /system/etc/ril/oper.lis
 
-service wmtLoader /system/bin/wmt_loader
+service wmtLoader /system/bin/logwrapper /system/bin/wmt_loader
     user root
     group root
     class main
     oneshot
    
-service conn_launcher /system/bin/6620_launcher -p /system/etc/firmware/
+service conn_launcher /system/bin/logwrapper /system/bin/6620_launcher -p /system/etc/firmware/
     user system
     group system
     class core
 
-# CM Performance Profiles
-
-# Powersave
-on property:sys.perf.profile=0
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq "747500"
-	write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq "598000"
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "interactive"
-    write /sys/devices/system/cpu/cpu2/online "0"
-    write /sys/devices/system/cpu/cpu3/online "0"
-
-# Balanced
-on property:sys.perf.profile=1
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq "1300000"
-	write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq "598000"
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "hotplug"
-    write /sys/devices/system/cpu/cpu2/online "1"
-    write /sys/devices/system/cpu/cpu3/online "1"
-
-# Performance
-on property:sys.perf.profile=2
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq "1300000"
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq "1300000"
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "hotplug"
-    write /sys/devices/system/cpu/cpu2/online "1"
-    write /sys/devices/system/cpu/cpu3/online "1"
-
 on fs
     write /proc/bootprof "INIT:eMMC:Mount_START"
-    mount_all /fstab.mt6572
 
-# change partition permissions
-    exec /system/bin/chmod 0660 /dev/proinfo
-    exec /system/bin/chown root:system /dev/proinfo
-    exec /system/bin/chmod 0660 /dev/nvram
-    exec /system/bin/chown root:system /dev/nvram
-    exec /system/bin/chmod 0660 /dev/misc
-    exec /system/bin/chown root:system /dev/misc
+    mkdir /protect_f 0771 system system
+    mkdir /protect_s 0771 system system
+
+    mount_all /fstab.mt6592
+
     write /proc/bootprof "INIT:NAND:Mount_END"
-
-    mkdir /data/agps_supl 0771 gps system
-    mkdir /data/gps_mnl 0771 gps system
 
 on property:wlan.driver.status=ok
 	write /dev/wmtWifi "1"
@@ -422,17 +408,28 @@ service iprenew_p2p /system/bin/dhcpcd -n
 
 service drvbd /system/bin/drvbd
     class main
-    user system
-    group system
+    user root
+    group root
 
 service nvram_daemon /system/bin/nvram_daemon
     class main
     user root
-    group system
+    group system root
     oneshot
 
 service NvRAMAgent /system/bin/nvram_agent_binder
-    class main
+     user system
+     group system nvram
+
+service thermal_manager /system/bin/thermal_manager
+    user root
+    oneshot
+
+service thermal /system/bin/thermal
+    user system
+    group system
+
+service thermald /system/bin/thermald
     user system
     group system
 
@@ -456,19 +453,6 @@ service emcsmdlogger /system/bin/emcsmdlogger
     group system shell radio sdcard_rw inet sdcard_r media_rw ccci
     disabled
     oneshot
-
-service thermal_manager /system/bin/thermal_manager
-    user root
-    oneshot
-
-service thermal /system/bin/thermal
-    user system
-    group system
-
-service thermald /system/bin/thermald
-    user system
-    group system
-
 
 #
 #sensor service (begin)
@@ -573,6 +557,8 @@ service mc64xxd /system/bin/mc64xxd
 #sensor service (end)
 #
 #
+#
+#
 
 service agpsd /system/bin/mtk_agpsd
     class main
@@ -601,3 +587,48 @@ service BGW /system/xbin/BGW
     group gps system radio
     class main
     oneshot
+
+# Offline charging
+service ipod /system/bin/ipod
+    user root
+    group root
+    class ipo
+
+# CM Performance Profiles
+
+# Powersave
+on property:sys.perf.profile=0
+    write /sys/devices/system/cpu/cpu2/online "1"
+    write /sys/devices/system/cpu/cpu3/online "1"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq "1300000"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq "598000"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "powersave"
+    write /sys/devices/system/cpu/cpu4/online "0"
+    write /sys/devices/system/cpu/cpu5/online "0"
+    write /sys/devices/system/cpu/cpu6/online "0"
+    write /sys/devices/system/cpu/cpu7/online "0"
+
+# Balanced
+on property:sys.perf.profile=1
+    write /sys/devices/system/cpu/cpu2/online "1"
+    write /sys/devices/system/cpu/cpu3/online "1"
+    write /sys/devices/system/cpu/cpu4/online "1"
+    write /sys/devices/system/cpu/cpu5/online "1"
+    write /sys/devices/system/cpu/cpu6/online "1"
+    write /sys/devices/system/cpu/cpu7/online "1"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq "1664000"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq "598000"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "hotplug"
+
+# Performance
+on property:sys.perf.profile=2
+    write /sys/devices/system/cpu/cpu2/online "1"
+    write /sys/devices/system/cpu/cpu3/online "1"
+    write /sys/devices/system/cpu/cpu4/online "1"
+    write /sys/devices/system/cpu/cpu5/online "1"
+    write /sys/devices/system/cpu/cpu6/online "1"
+    write /sys/devices/system/cpu/cpu7/online "1"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq "1664000"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq "598000"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "performance"
+

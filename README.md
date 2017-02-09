@@ -1,21 +1,17 @@
-----Thanks for ferhung, fire855 & superdragonpt, who are contributing to the working CyanogenMod of MTK hardware(MT6592&MT6582).---
+Alcatel Pop C2 (Yaris_M_GSM)
+=========================
 
----- Also thanks to all developers that help me building this sources for Atenea/D5/whatever. Blerfont, Jose, Visionary, etc... ---
+Basic   | Spec Sheet
+-------:|:-------------------------
+CPU     | 1.3GHz Dual-Core MTK6572
+GPU     | Mali 400 MP
+Memory  | 512MB RAM
+Shipped Android Version | 4.2.2
+Current Stable Android Version | 4.4.2
+Storage | 4GB
+Battery | 1400 mAh
+Display | 4" 800 x 480 px
+Camera  | 3.2MPx.
 
-This is a device tree for Alcatel Pop C2 codename yaris_m_gsm, which is based on MT6572 SoC.
-# Build
 
-* init
-  Sync CyanogenMod source modified by ferhung:
 
-        # repo init -u git://github.com/ferhung/android.git -b cm-12.1
-
-        # repo sync
-
-	# git clone this repo to device/tct/yaris_m_gsm and the vendor repo to the needed place.
-
-* full build
-        
-        # source build/envsetup.sh
-
-        # lunch cm_yaris_m_gsm && mka bacon

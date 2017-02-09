@@ -150,7 +150,6 @@
 
 # Mali node
 /dev/mali                0666    system graphics
-/dev/mali0 
 
 #MTK In-House TEE
 /dev/trustzone            0660   root       drmrpc
