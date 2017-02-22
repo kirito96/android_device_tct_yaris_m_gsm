@@ -133,7 +133,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	persist.service.debuggable=1 \
 	persist.mtk.wcn.combo.chipid=-1
 
-PRODUCT_NAME := full_Q
+PRODUCT_NAME := full_yaris_m_gsm
 PRODUCT_DEVICE := yaris_m_gsm
 
 # Boot animation
