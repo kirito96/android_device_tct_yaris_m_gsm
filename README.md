@@ -8,7 +8,7 @@ This is a device tree for Alcatel Pop C2 codename yaris_m_gsm, which is based on
 * init
   Sync CyanogenMod source modified by ferhung:
 
-        # repo init -u git://github.com/ferhung/android.git -b cm-12.1
+        # repo init -u git://github.com/LineageOS-MTK/android.git -b cm-12.1
 
         # repo sync
 
