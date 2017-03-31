@@ -4,16 +4,13 @@
 
 #<src>          <mnt_point>        <type>       <mnt_flags and options>       <fs_mgr_flags>
 
-/dev/block/mmcblk0p7   	/system   	ext4      ro,noatime      wait
-/dev/block/mmcblk0p7   	/system    	f2fs  ro,noatime,nosuid,nodev,discard,nodiratime,inline_xattr,inline_data,active_logs=4                                                          wait
-/dev/block/mmcblk0p8   	/cache     	ext4      noatime,nosuid,nodev,noauto_da_alloc     wait
-/dev/block/mmcblk0p8   	/cache      f2fs  rw,nosuid,nodev,noatime,nodiratime,inline_xattr                wait,check
-/dev/block/mmcblk0p9   	/data     	ext4      noatime,nosuid,nodev,noauto_da_alloc     wait,encryptable=footer
-/dev/block/mmcblk0p9  	/data       f2fs  rw,nosuid,nodev,noatime,nodiratime,inline_xattr           wait,check,encryptable=footer
+/emmc@android        /system       ext4      ro,noatime      wait
+/emmc@cache          /cache        ext4      noatime,nosuid,nodev,noauto_da_alloc     wait
+/emmc@usrdata        /data         ext4      noatime,nosuid,nodev,noauto_da_alloc     wait,encryptable=footer
 /emmc@protect_f      /protect_f    ext4      noatime,nosuid,nodev,noauto_da_alloc    wait,check
 /emmc@protect_s      /protect_s    ext4      noatime,nosuid,nodev,noauto_da_alloc    wait,check
-/dev/block/mmcblk0p5   	/custpack     emmc      defaults        defaults
-/dev/block/mmcblk0p6    /mobile_info  emmc       defaults        defaults
+/emmc@custpack       /custpack     emmc      defaults        defaults
+/emmc@mobile_info    /mobile_info  emmc       defaults        defaults
 
 /devices/platform/mtk-msdc.1/mmc_host/mmc1      auto     auto    defaults voldmanaged=sdcard0:auto
 
