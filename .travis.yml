@@ -13,7 +13,7 @@ before_script:
 - mv $HOME/miminal $HOME/twrp	
 script:
 - cd $HOME/twrp
-- git clone https://github.com/kirito96/android_device_tct_yaris_m_gsm -b twrp-cm-12.1 device/TCT/Yaris_M_GSM
+- git clone https://github.com/kirito96/android_device_tct_yaris_m_gsm.git device/TCT/Yaris_M_GSM
   &> /dev/null
 - rm -rf bootable/recovery
 - git clone https://github.com/omnirom/android_bootable_recovery.git bootable/recovery
