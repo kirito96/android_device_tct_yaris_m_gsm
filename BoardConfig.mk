@@ -1,52 +1,92 @@
-USE_CAMERA_STUB := true
-
 # inherit from the proprietary version
--include vendor/tct/yaris_m_gsm/BoardConfigVendor.mk
+-include vendor/TCT/Yaris_M_GSM/BoardConfigVendor.mk
 
-TARGET_ARCH := arm
-TARGET_NO_BOOTLOADER := true
+
+# Board
 TARGET_BOARD_PLATFORM := mt6572
+TARGET_NO_BOOTLOADER := true
+TARGET_ARCH := arm
+TARGET_ARCH_VARIANT := armv7-a-neon
+TARGET_ARCH_VARIANT_CPU := cortex-a7
+ARCH_ARM_HAVE_VFP := true
+ARCH_ARM_HAVE_NEON := true
+ARCH_ARM_HAVE_TLS_REGISTER := true
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
-TARGET_ARCH_VARIANT := armv7-a-neon
-TARGET_CPU_VARIANT := cortex-a7
 TARGET_CPU_SMP := true
-ARCH_ARM_HAVE_TLS_REGISTER := true
+TARGET_CPU_VARIANT := cortex-a7
+DEVICE_RESOLUTION := 480x800
+BOARD_HAS_NO_SELECT_BUTTON := true
 
-TARGET_BOOTLOADER_BOARD_NAME := yaris_m_gsm
-
-BOARD_KERNEL_CMDLINE :=
-BOARD_KERNEL_BASE := 0x10000000
-BOARD_KERNEL_PAGESIZE := 2048
-
-# fix this up by examining /proc/mtd on a running device
-BOARD_BOOTIMAGE_PARTITION_SIZE := 6291456
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 6291456
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 681574400
+# make_ext4fs requires numbers in dec format
+BOARD_BOOTIMAGE_PARTITION_SIZE := 20971520
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 20971520
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 545259520
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 1073741824
 BOARD_FLASH_BLOCK_SIZE := 512
 
-TARGET_PREBUILT_KERNEL := device/tct/yaris_m_gsm/kernel
-BOARD_HAS_NO_SELECT_BUTTON := true
+TARGET_BOOTLOADER_BOARD_NAME := Yaris_M_GSM
 
-TARGET_RECOVERY_FSTAB := device/tct/yaris_m_gsm/recovery/recovery.fstab
+TARGET_USERIMAGES_USE_EXT4:=true
+TARGET_USERIMAGES_SPARSE_EXT_DISABLED := false
+
 BOARD_CUSTOM_BOOTIMG := true
-BOARD_CUSTOM_MKBOOTIMG := $(HOST_OUT_EXECUTABLES)/mtkbootimg$(HOST_EXECUTABLE_SUFFIX)
-BOARD_CUSTOM_BOOTIMG_MK := device/tct/yaris_m_gsm/bootimg.mk
-BOARD_MKBOOTIMG_ARGS := --mtk 1
+BOARD_CUSTOM_MKBOOTIMG := mtkbootimg
+BOARD_MKBOOTIMG_ARGS := --base 0x10000000 --pagesize 2048 --kernel_offset 0x00008000 --ramdisk_offset 0x01000000 --second_offset 0x00f00000 --tags_offset 0x00000100 --mtk 1
+BOARD_CUSTOM_BOOTIMG_MK := device/TCT/Yaris_M_GSM/bootimg.mk
+
+TARGET_PREBUILT_KERNEL := device/TCT/Yaris_M_GSM/kernel
+
+# Assert
+TARGET_OTA_ASSERT_DEVICE := Yaris_M_GSM,yaris_m_gsm,4032A
+
+
+RECOVERY_VARIANT := twrp
+#RECOVERY_VARIANT := philz
+#RECOVERY_VARIANT := carliv
+
+ifneq ($(RECOVERY_VARIANT),twrp)
+TARGET_RECOVERY_FSTAB := device/TCT/Yaris_M_GSM/recovery/recovery.fstab
+endif
+
+
+# CARLIV
+ifeq ($(RECOVERY_VARIANT),carliv)
+BOARD_USE_CUSTOM_RECOVERY_FONT := \"font_10x18.h\"
+VIBRATOR_TIMEOUT_FILE := /sys/devices/virtual/timed_output/vibrator/enable
+BOARD_HAS_MTK := true
+BOARD_NEEDS_MTK_GETSIZE := true
+DEVICE_RESOLUTION := 480x800
+endif
+
+
+# PHILZ
+ifeq ($(RECOVERY_VARIANT),philz)
+TARGET_COMMON_NAME := TCT Yaris_M_GSM
+BOARD_USE_MTK_LAYOUT := true
+BOARD_MTK_BOOT_LABEL := "/bootimg"
+#BOARD_USE_NTFS_3G := false
+BRIGHTNESS_SYS_FILE := "/sys/class/leds/lcd-backlight/brightness"
+TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/platform/mt_usb/gadget/lun%d/file"
+TARGET_SCREEN_HEIGHT := 800
+TARGET_SCREEN_WIDTH := 480
+TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
+endif
 
 # TWRP
-RECOVERY_VARIANT := twrp
+ifeq ($(RECOVERY_VARIANT),twrp)
+TARGET_RECOVERY_FSTAB := device/TCT/Yaris_M_GSM/recovery/twrp.fstab
 TW_NO_EXFAT := true
 TWHAVE_SELINUX := true
 TW_THEME := portrait_mdpi
 TW_NO_EXFAT_FUSE := true
 TW_USE_MODEL_HARDWARE_ID_FOR_DEVICE_ID := true
-#TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/platform/mt_usb/musb-hdrc.0/gadget/lun%d/file"
 TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/platform/mt_usb/gadget/lun%d/file"
+#TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/platform/mt_usb/musb-hdrc.0/gadget/lun%d/file"
 TW_EXCLUDE_SUPERSU := true
-TARGET_RECOVERY_PIXEL_FORMAT := "BRGA_8888"
+TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
 DEVICE_RESOLUTION := 480x800
 TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
 TW_MAX_BRIGHTNESS := 255
 TW_CUSTOM_CPU_TEMP_PATH := /sys/devices/virtual/thermal/thermal_zone1/temp
+endif
