@@ -20,7 +20,6 @@ script:
   &> /dev/null
 - source build/envsetup.sh ; lunch cm_Yaris_M_GSM-eng
 - make -j4 recoveryimage &> log
-- mkazip_Yaris_M_GSM
 - curl --upload-file "./log" "https://transfer.sh/log"
 - cd out/target/product/Yaris_M_GSM/
 - md5sum recovery.img > md5
