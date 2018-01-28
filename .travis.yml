@@ -8,28 +8,18 @@ before_script:
   curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev
   libx11-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip maven
   schedtool &> /dev/null
-- wget https://github.com/kirito96/twrp-5.1.1-source/releases/download/5.1-cm/twrp-5.1-no-repo-cm.tar.xz -O $HOME/twrp.tar.xz
+- wget https://github.com/kirito96/twrp-5.1.1-source/releases/download/5.1-cm/twrp-5.1-cm.tar.xz -O $HOME/twrp.tar.xz
 - tar -xvf twrp.tar.xz &> log
-- mv $HOME/miminal $HOME/twrp	
+- mv $HOME/twrp-5.1-cm $HOME/twrp	
 script:
 - cd $HOME/twrp
 - git clone https://github.com/kirito96/android_device_tct_yaris_m_gsm.git device/TCT/Yaris_M_GSM
-  &> /dev/null
 - rm -rf bootable/recovery
 - git clone https://github.com/omnirom/android_bootable_recovery.git bootable/recovery
-  &> /dev/null
 - source build/envsetup.sh ; lunch cm_Yaris_M_GSM-eng
-- make -j4 recoveryimage &> log
-- curl --upload-file "./log" "https://transfer.sh/log"
+- make -j4 recoveryimage
 - cd out/target/product/Yaris_M_GSM/
 - md5sum recovery.img > md5
 - cp recovery.img "$(date +%Y%m%d)-$(cat md5)"
 - curl --upload-file "./$(date +%Y%m%d)-$(cat md5)" "https://transfer.sh/$(date +%Y%m%d)-$(cat
   md5)"
-- tar -H ustar -c "$(date +%Y%m%d)-$(cat md5)" > "$(date +%Y%m%d)-$(cat md5).tar"
-- echo "Made Tar"
-- curl --upload-file "./$(date +%Y%m%d)-$(cat md5).tar" "https://transfer.sh/$(date
-  +%Y%m%d)-$(cat md5).tar"
-- echo "####Made Zip#####"
-- curl --upload-file "./twrp-$(date +%Y%m%d)-3.0.3-UNOFFICIAL-Yaris_M_GSM.zip" "https://transfer.sh/twrp-$(date
-  +%Y%m%d)-3.0.3-UNOFFICIAL-Yaris_M_GSM.zip"
