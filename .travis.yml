@@ -19,6 +19,5 @@ script:
 - source build/envsetup.sh ; lunch cm_Yaris_M_GSM-eng
 - make -j4 recoveryimage
 - cd out/target/product/Yaris_M_GSM/
-- md5sum recovery.img > md5
-- mv recovery.img "$(date +%Y%m%d)-$(cat md5)"
-- curl --upload-file "./$(date +%Y%m%d)-$(cat md5)" "https://transfer.sh/$(date +%Y%m%d)-$(cat md5)"
+- mv recovery.img "$(date +%Y%m%d)-twrp-3.x-yaris_m_gsm.img"
+- curl --upload-file "./$(date +%Y%m%d)-twrp-3.x-yaris_m_gsm" "https://transfer.sh/$(date +%Y%m%d)-twrp-3.x-yaris_m_gsm.img"
