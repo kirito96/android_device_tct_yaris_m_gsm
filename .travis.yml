@@ -15,7 +15,7 @@ script:
 - cd $HOME/twrp
 - git clone https://github.com/kirito96/android_device_tct_yaris_m_gsm.git device/TCT/Yaris_M_GSM
 - rm -rf bootable/recovery
-- git clone https://github.com/omnirom/android_bootable_recovery.git bootable/recovery
+- git clone https://github.com/omnirom/android_bootable_recovery -b android-6.0 bootable/recovery
 - source build/envsetup.sh ; lunch cm_Yaris_M_GSM-eng
 - make -j4 recoveryimage
 - cd out/target/product/Yaris_M_GSM/
