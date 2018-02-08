@@ -8,7 +8,7 @@ before_script:
   curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev
   libx11-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip maven
   schedtool &> /dev/null
-- wget https://github.com/kirito96/twrp-5.1.1-source/releases/download/5.1-cm/twrp-5.1-cm.tar.xz -O $HOME/twrp.tar.xz
+- wget https://github.com/kirito96/minimal-cm-twrp-source/releases/download/5.1-cm/twrp-5.1-cm.tar.xz -O $HOME/twrp.tar.xz
 - tar -xvf twrp.tar.xz &> log
 - mv $HOME/twrp-5.1-cm $HOME/twrp	
 script:
