@@ -1,4 +1,4 @@
-LOCAL_PATH := device/alcatel/yaris
+LOCAL_PATH := device/tct/yaris_m_gsm
 
 ifeq ($(TARGET_PREBUILT_KERNEL),)
 	LOCAL_KERNEL := $(LOCAL_PATH)/kernel
@@ -11,4 +11,4 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product, build/target/product/full.mk)
 
-PRODUCT_NAME := yaris
+PRODUCT_NAME := yaris_m_gsm

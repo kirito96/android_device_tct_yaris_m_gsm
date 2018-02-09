@@ -1,1 +1,1 @@
-add_lunch_combo omni_yaris-userdebug
+add_lunch_combo omni_yaris_m_gsm-userdebug
